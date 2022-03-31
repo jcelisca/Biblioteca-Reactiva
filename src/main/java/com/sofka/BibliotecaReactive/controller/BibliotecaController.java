@@ -16,38 +16,38 @@ public class BibliotecaController {
     @Autowired
     private BibliotecaService service;
 
-    @PostMapping("/biblioteca")
+    @PostMapping("/bibliotecaReactiva")
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<Biblioteca> save(@RequestBody Biblioteca biblioteca){
-        return service.save(biblioteca);
+        return service.guardar(biblioteca);
     }
 
-    @GetMapping("/biblioteca")
+    @GetMapping("/bibliotecaReactiva")
     public Flux<Biblioteca> findAll(){
         return service.findAll();
     }
 
-    @GetMapping("/biblioteca/{Id}/disponibilidad")
-    public Mono<String> consultarDisponibilidad(@PathVariable("Id") String id){
+    @GetMapping("/bibliotecaReactiva/{id}/disponibilidad")
+    public Mono<String> consultarDisponibilidad(@PathVariable("id") String id){
         return service.consultarDisponibilidad(id);
     }
 
-    @GetMapping("/biblioteca/{Id}/prestar")
-    public Mono<String> prestarRecurso(@PathVariable("Id") String id){
+    @GetMapping("/bibliotecaReactiva/{id}/prestar")
+    public Mono<String> prestarRecurso(@PathVariable("id") String id){
         return service.prestarRecurso(id);
     }
 
-    @GetMapping("/biblioteca/{categoria}/recomendar")
+    @GetMapping("/bibliotecaReactiva/{categoria}/recomendar")
     public Flux<Biblioteca> recomendacion(@PathVariable("categoria") String categoria){
         return service.recomendacion(categoria);
     }
 
-    @GetMapping("/biblioteca/{Id}/devolver")
-    public Mono<String> devolverRecurso(@PathVariable("Id") String id){
+    @GetMapping("/bibliotecaReactiva/{id}/devolver")
+    public Mono<String> devolverRecurso(@PathVariable("id") String id){
         return service.devolverRecurso(id);
     }
 
-    @DeleteMapping("/biblioteca/{Id}/delete")
+    @DeleteMapping("/bibliotecaReactiva/{Id}/delete")
     private Mono<ResponseEntity<Biblioteca>> delete(@PathVariable("Id") String id) {
         return service.delete(id)
                 .flatMap(biblioteca -> Mono.just(ResponseEntity.ok(biblioteca)))

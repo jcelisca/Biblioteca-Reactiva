@@ -20,7 +20,7 @@ public class BibliotecaService {
                 .flatMap(p->repository.deleteById(p.getId()).thenReturn(p));
     }
 
-    public Mono<Biblioteca> save(Biblioteca biblioteca){
+    public Mono<Biblioteca> guardar(Biblioteca biblioteca){
         return repository.save(biblioteca);
     }
 
@@ -36,8 +36,8 @@ public class BibliotecaService {
         return repository.findByCategoria(categoria);
     }
 
-    public Mono<String> consultarDisponibilidad(String Id){
-        return repository.findById(Id)
+    public Mono<String> consultarDisponibilidad(String id){
+        return repository.findById(id)
                 .flatMap(biblioteca -> {
                     if(biblioteca.getDisponibilidad()> 0){
                         return Mono.just("Hay disponibles "+biblioteca.getDisponibilidad()+
@@ -48,49 +48,38 @@ public class BibliotecaService {
                 });
     }
 
-    public Mono<String> prestarRecurso(String Id){
-        Biblioteca b = new Biblioteca();
-        return repository.findById(Id)
-                .flatMap(biblioteca -> {
-                    if(biblioteca.getDisponibilidad()>0){
-                        if(biblioteca.getEstado().equals("No Prestado")){
-                            b.setId(Id);
-                            b.setName(biblioteca.getName());
-                            b.setCategoria(biblioteca.getCategoria());
-                            b.setDisponibilidad(biblioteca.getDisponibilidad()-1);
-                            b.setEstado("Prestado");
-                            b.setFechaPrestamo(LocalDate.now());
-                            save(b);
-                            return Mono.just("Se presta el libro: "+b.getName()+". Quedan: "
-                                    +b.getDisponibilidad());
-                        }
-                        b.setId(Id);
-                        b.setName(biblioteca.getName());
-                        b.setCategoria(biblioteca.getCategoria());
-                        b.setDisponibilidad(biblioteca.getDisponibilidad()-1);
-                        b.setEstado(biblioteca.getEstado());
+    public Mono<String> prestarRecurso(String id){
+        return repository.findById(id)
+                .flatMap(biblioteca1 -> {
+                    if(biblioteca1.getDisponibilidad()>0){
+                        Biblioteca b = new Biblioteca();
+                        b.setId(id);
+                        b.setName(biblioteca1.getName());
+                        b.setCategoria(biblioteca1.getCategoria());
+                        b.setDisponibilidad(biblioteca1.getDisponibilidad()-1);
+                        b.setEstado("Prestado");
                         b.setFechaPrestamo(LocalDate.now());
-                        save(b);
+                        guardar(b);
                         return Mono.just("Se presta el libro: "+b.getName()+". Quedan: "
                                 +b.getDisponibilidad());
                     }
                     return Mono.just("No hay disponibles. El último ejemplar se prestó el "
-                            +biblioteca.getFechaPrestamo());
+                            +biblioteca1.getFechaPrestamo());
                 });
     }
 
-    public Mono<String> devolverRecurso(String Id){
-        Biblioteca b = new Biblioteca();
-        return repository.findById(Id)
-                .flatMap(biblioteca -> {
-                    if(biblioteca.getEstado().equals("Prestado")){
-                        b.setId(Id);
-                        b.setName(biblioteca.getName());
-                        b.setCategoria(biblioteca.getCategoria());
-                        b.setDisponibilidad(biblioteca.getDisponibilidad()+1);
+    public Mono<String> devolverRecurso(String id){
+        return repository.findById(id)
+                .flatMap(biblioteca1 -> {
+                    if(biblioteca1.getEstado().equals("Prestado")){
+                        Biblioteca b = new Biblioteca();
+                        b.setId(id);
+                        b.setName(biblioteca1.getName());
+                        b.setCategoria(biblioteca1.getCategoria());
+                        b.setDisponibilidad(biblioteca1.getDisponibilidad()+1);
                         b.setEstado("No Prestado");
                         b.setFechaPrestamo(LocalDate.now());
-                        save(b);
+                        guardar(b);
                         return Mono.just("Se devolvio el libro "+b.getName());
                     }
                     return Mono.just("El recurso no se puede devolver porque no se encuentra en préstamo");
